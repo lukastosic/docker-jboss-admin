@@ -22,7 +22,14 @@ ENV LAUNCH_JBOSS_IN_BACKGROUND true
 EXPOSE 8080
 
 # Setting up entrypoint file that is used to setup username and password
-COPY docker-entrypoint.sh /opt/jboss/wildfly/
+# Must be done with user root adjust proper chown and chmod properties
+USER root
+ADD docker-entrypoint.sh $JBOSS_HOME
+RUN chown jboss $JBOSS_HOME/docker-entrypoint.sh
+RUN chmod 777 $JBOSS_HOME/docker-entrypoint.sh
+
+# Switch back to user jboss
+USER jboss
 
 ENTRYPOINT ["/opt/jboss/wildfly/docker-entrypoint.sh"]
 
