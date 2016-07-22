@@ -10,18 +10,37 @@ Yes there is, and this one is 99.9% blatant copy-paste of that image
 
 ### So what is different ?
 
-This image has setting for admin username/password and it also starts up management.
+This image contains added `docker-entrypoint.sh` file that sets username and password for admin account.
 
-As you can see in `Dockerfile` username/password for admin account is `admin/admin123`.
+This file looks for environment variables (set by `docker run` command) and if they exist it will use them to set username/password, otherwise it will set defaults.
+
+#### Default admin account
+
+Default username password for admin account is `admin/password`.
 
 ## How to use this image ?
 
-You are more than welcome to download this repo and edit `Dockerfile` to your own liking.
+You are more than welcome to download this repository and edit `Dockerfile` to your own liking.
+
+Keep in mind that you will also need file `docker-entrypoint.sh`.
 
 If you want to use it "as-is" you can simply execute docker commands (because image is public on [Docker Hub](http://hub.docker.com)):
 
 * `docker pull lukastosic/wildfly-admin` to obtain the image
 * `docker run lukastosic/wildfly-admin` to run container
+
+### Run with custom username password
+
+In order to set admin username/password you must _inject_ environment variables into container. You can do that with `-e` switch. Environment variables are:
+
+* `WILDFLY_ADMIN_USERNAME`
+* `WILDFLY_ADMIN_PASSWORD`
+
+Your run command with these parameter looks like this:
+
+```
+docker run -e WILDFLY_ADMIN_USERNAME=<username> -e WILDFLY_ADMIN_PASSWORD=<password> lukastosic/wildfly-admin
+```
 
 ### Run with port mappings
 
@@ -48,8 +67,12 @@ Will start up container with followin properties:
 * container port `8080` is mapped to host port `9500`
 * container port `9990` is mappet to host port `9501`
 
-#### Little note about `.sh` files
+### Couple of automation scripts
 
-In order for quick start up and stopping container in my everyday work, I needed to create these 2 files to ease up (automate) that task. 
+In `git` repository there is folder called `start-stop-scripts` where you can find couple of `.sh` files that can help you quickly start or stop containers.
+
+These scripts contain custom port mappings and they have versions with and without custom password.
+
+These scripts are completely _personal_ (I am using them in that way in my own test/dev environment), so you might find them useless in your workflow.
 
 They are **not needed** for this image to work, so you don't have to copy them, but you might find them useful.

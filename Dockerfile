@@ -1,8 +1,3 @@
-###
-### This entire docker file is basically copy-paste from official Docker hub wildfly.
-### File is edited to setup admin username/password and to startup with management
-###
-
 # Use latest jboss/base-jdk:8 image as the base
 FROM jboss/base-jdk:8
 
@@ -26,8 +21,10 @@ ENV LAUNCH_JBOSS_IN_BACKGROUND true
 # Expose the ports we're interested in
 EXPOSE 8080
 
-# Setup admin username password
-RUN /opt/jboss/wildfly/bin/add-user.sh admin admin123 --silent
+# Setting up entrypoint file that is used to setup username and password
+COPY docker-entrypoint.sh /opt/jboss/wildfly/
+
+ENTRYPOINT ["/opt/jboss/wildfly/docker-entrypoint.sh"]
 
 # Set the default command to run on boot
 # This will boot WildFly in the standalone mode and bind to all interface
