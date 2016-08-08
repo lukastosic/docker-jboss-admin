@@ -22,16 +22,26 @@ ENV LAUNCH_JBOSS_IN_BACKGROUND true
 EXPOSE 8080
 
 # Setting up entrypoint file that is used to setup username and password
-# Must be done with user root adjust proper chown and chmod properties
 USER root
 ADD docker-entrypoint.sh $JBOSS_HOME
+ENV MYSQL_JDBC_FOLDER /opt/jboss/wildfly/modules/system/layers/base/com/mysql/driver/main/
+
+# Add MYSQL JDBC connector and script to add datasource driver
+CMD ["mkdir $MYSQL_JDBC_FOLDER"]
+ADD mysql-connector-java-5.1.39-bin.jar $MYSQL_JDBC_FOLDER
+ADD module.xml $MYSQL_JDBC_FOLDER
+ADD customization $JBOSS_HOME/customization
+
 RUN chown jboss $JBOSS_HOME/docker-entrypoint.sh
 RUN chmod 777 $JBOSS_HOME/docker-entrypoint.sh
 
-# Switch back to user jboss
-USER jboss
+VOLUME ["/opt/jboss/wildfly/standalone/deployments"]
+VOLUME ["/opt/jboss/wildfly/standalone/log"]
 
 ENTRYPOINT ["/opt/jboss/wildfly/docker-entrypoint.sh"]
+
+# Execute command to set datasource
+RUN $JBOSS_HOME/customization/execute.sh 
 
 # Set the default command to run on boot
 # This will boot WildFly in the standalone mode and bind to all interface
