@@ -28,8 +28,8 @@ ENV MYSQL_JDBC_FOLDER /opt/jboss/wildfly/modules/system/layers/base/com/mysql/dr
 
 # Add MYSQL JDBC connector and script to add datasource driver
 CMD ["mkdir $MYSQL_JDBC_FOLDER"]
-ADD mysql-connector-java-5.1.39-bin.jar $MYSQL_JDBC_FOLDER
-ADD module.xml $MYSQL_JDBC_FOLDER
+ADD jdbc-driver/mysql/mysql-connector-java-5.1.39-bin.jar $MYSQL_JDBC_FOLDER
+ADD jdbc-driver/mysql/module.xml $MYSQL_JDBC_FOLDER
 ADD customization $JBOSS_HOME/customization
 
 RUN chown jboss $JBOSS_HOME/docker-entrypoint.sh
@@ -41,6 +41,8 @@ VOLUME ["/opt/jboss/wildfly/standalone/log"]
 ENTRYPOINT ["/opt/jboss/wildfly/docker-entrypoint.sh"]
 
 # Execute command to set datasource
+RUN chmod 777 $JBOSS_HOME/customization/execute.sh
+RUN chmod 777 $JBOSS_HOME/customization/commands.cli
 RUN $JBOSS_HOME/customization/execute.sh 
 
 # Set the default command to run on boot
